@@ -23,47 +23,45 @@
 {                                                                           }
 {***************************************************************************}
 
-unit TelegramBotApi.CloudAPI.Authenticator;
+unit TelegramBotApi.Types.Games;
 
 interface
 
 uses
-  CloudAPI.IAuthenticator,
-  CloudAPI.Request;
+  CloudApi.Attributes,
+  CloudApi.Types,
+  System.JSON.Serializers,
+  TelegramBotApi.Types.Abstract;
 
 type
-  TTelegramAuthenticator = class(TInterfacedObject, IAuthenticator)
+
+  /// <summary>
+  /// Use this method to send a game. On success, the sent Message is returned.
+  /// </summary>
+  [caName('sendGame')]
+  [caMethod(TcaMethod.POST)]
+  [caParameterType(TcaParameterType.GetOrPost)]
+  TtgSendGameArgument = class(TtgSendMessageBase)
   private
-    FBotToken: string;
-    function GetBotToken: string;
-    procedure SetBotToken(const Value: string);
+    [caName('game_short_name')]
+    [caIsRequaired]
+    [caDefaultValueString('')]
+    FGameShortName: string;
+    [caName('protect_content')]
+    FProtectContent: Boolean;
   public
-    constructor Create(const ABotToken: string);
-    procedure Authenticate(ARequest: IcaRequest);
-    property BotToken: string read GetBotToken write SetBotToken;
+    property ChatId;
+    /// <summary>
+    /// Short name of the game, serves as the unique identifier for the game. Set up
+    /// your games via Botfather.
+    /// </summary>
+    property GameShortName: string read FGameShortName write FGameShortName;
+    /// <summary>
+    /// Protects the contents of the sent message from forwarding and saving
+    /// </summary>
+    property ProtectContent: Boolean read FProtectContent write FProtectContent;
   end;
 
 implementation
-
-constructor TTelegramAuthenticator.Create(const ABotToken: string);
-begin
-  inherited Create;
-  FBotToken := ABotToken;
-end;
-
-procedure TTelegramAuthenticator.Authenticate(ARequest: IcaRequest);
-begin
-  ARequest.AddUrlSegment('token', FBotToken);
-end;
-
-function TTelegramAuthenticator.GetBotToken: string;
-begin
-  Result := FBotToken;
-end;
-
-procedure TTelegramAuthenticator.SetBotToken(const Value: string);
-begin
-  FBotToken := Value;
-end;
 
 end.

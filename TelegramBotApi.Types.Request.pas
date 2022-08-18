@@ -1,4 +1,29 @@
-﻿unit TelegramBotApi.Types.Request;
+﻿{***************************************************************************}
+{                                                                           }
+{           TelegaPi                                                        }
+{                                                                           }
+{           Copyright (C) 2021 Maxim Sysoev                                 }
+{                                                                           }
+{           https://t.me/CloudAPI                                           }
+{                                                                           }
+{                                                                           }
+{***************************************************************************}
+{                                                                           }
+{  Licensed under the Apache License, Version 2.0 (the "License");          }
+{  you may not use this file except in compliance with the License.         }
+{  You may obtain a copy of the License at                                  }
+{                                                                           }
+{      http://www.apache.org/licenses/LICENSE-2.0                           }
+{                                                                           }
+{  Unless required by applicable law or agreed to in writing, software      }
+{  distributed under the License is distributed on an "AS IS" BASIS,        }
+{  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. }
+{  See the License for the specific language governing permissions and      }
+{  limitations under the License.                                           }
+{                                                                           }
+{***************************************************************************}
+
+unit TelegramBotApi.Types.Request;
 
 interface
 
@@ -8,7 +33,8 @@ uses
   TelegramBotApi.Types,
   TelegramBotApi.Types.Abstract,
   TelegramBotApi.Types.Enums,
-  TelegramBotApi.Types.Keyboards;
+  TelegramBotApi.Types.Keyboards,
+  TelegramBotApi.Types.WebApps;
 
 type
   TtgEmptyArgument = class(TInterfacedObject);
@@ -40,332 +66,6 @@ type
   [caName('close')]
   [caParameterType(TcaParameterType.QueryString)]
   TtgCloseArgunent = class(TtgEmptyArgument);
-
-  [caName('forwardMessage')]
-  [caParameterType(TcaParameterType.QueryString)]
-  /// <summary>Use this method to forward messages of any kind. On success, the sent
-  /// Message is returned.</summary>
-  TtgForwardMessageArgument = class(TtgMessageAbstract)
-  private
-    [caName('from_chat_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    FFromChatId: TtgUserLink;
-    [caName('message_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    FMessageID: Int64;
-  public
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    property ChatId;
-    /// <summary>Unique identifier for the chat where the original message was sent (or
-    /// channel username in the format @channelusername)</summary>
-    property FromChatId: TtgUserLink read FFromChatId write FFromChatId;
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.</summary>
-    property DisableNotification;
-    /// <summary>Message identifier in the chat specified in from_chat_id</summary>
-    property MessageID: Int64 read FMessageID write FMessageID;
-    constructor Create; override;
-    destructor Destroy; override;
-  end;
-
-  [caName('copyMessage')]
-  [caParameterType(TcaParameterType.QueryString)]
-  /// <summary>Use this method to send text messages.
-  /// On success, the sent Message is returned.
-  /// </summary>
-  TtgCopyMessageArgument = class(TtgSendMessageBaseWithParseMode)
-  private
-    [caName('from_chat_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    FFromChatId: TtgUserLink;
-    [caName('message_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    FMessageID: Int64;
-    [caName('caption')]
-    [caDefaultValueStringAttribute('')]
-    FCaption: string;
-    [caName('caption_entities')]
-    [caDefaultValueString('[]')]
-    FCaptionEntities: TArray<TtgMessageEntity>;
-  public
-    constructor Create; override;
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    property ChatId;
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    property FromChatId: TtgUserLink read FFromChatId write FFromChatId;
-    /// <summary>Message identifier in the chat specified in from_chat_id</summary>
-    property MessageID: Int64 read FMessageID write FMessageID;
-    /// <summary>New caption for media, 0-1024 characters after entities parsing. If
-    /// not specified, the original caption is kept
-    /// </summary>
-    property Caption: string read FCaption write FCaption;
-    /// <summary>Send Markdown or HTML, if you want Telegram apps to show bold, italic,
-    /// fixed-width text or inline URLs in your bot's message.   </summary>
-    property ParseMode;
-    /// <summary> List of special entities that appear in the new caption, which can be
-    /// specified instead of parse_mode
-    /// </summary>
-    property CaptionEntities: TArray<TtgMessageEntity> read FCaptionEntities write FCaptionEntities;
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.</summary>
-    property DisableNotification;
-    /// <summary>If the message is a reply, ID of the original message</summary>
-    property ReplyToMessageId;
-    /// <summary>
-    /// Pass True, if the message should be sent even if the specified replied-to
-    /// message is not found
-    /// </summary>
-    property AllowSendingWithoutReply;
-  end;
-
-  /// <summary>
-  /// Use this method to send phone contacts. On success, the sent Message is returned.
-  /// </summary>
-  [caName('sendContact')]
-  [caParameterType(TcaParameterType.GetOrPost)]
-  TtgSendContactArgument = record
-  public
-    [caName('chat_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    ChatId: TtgUserLink;
-    [caName('phone_number')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    /// <summary>Contact's phone number</summary>
-    PhoneNumber: string;
-    [caName('first_name')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    /// <summary>Contact's first name</summary>
-    FirstName: string;
-    [caName('last_name')]
-    [caDefaultValueString('')]
-    /// <summary>Contact's last name</summary>
-    LastName: string;
-    [caName('vcard')]
-    [caDefaultValueString('')]
-    /// <summary>Additional data about the contact in the form of a vCard, 0-2048 bytes</summary>
-    VCard: string;
-    [caDefaultValueBoolean(False)]
-    [caName('disable_notification')]
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.</summary>
-    DisableNotification: Boolean;
-    [caName('reply_to_message_id')]
-    [caDefaultValueInt64(0)]
-    /// <summary>If the message is a reply, ID of the original message</summary>
-    ReplyToMessageId: Int64;
-    class function Default: TtgSendContactArgument; static;
-  end;
-
-  /// <summary> Use this method to send audio files, if you want Telegram clients to
-  /// display the file as a playable voice message. For this to work, your audio must
-  /// be in an .OGG file encoded with OPUS (other formats may be sent as Audio or
-  /// Document). On success, the sent Message is returned. Bots can currently send
-  /// voice messages of up to 50 MB in size, this limit may be changed in the future.
-  /// </summary>
-  [caName('sendVideoNote')]
-  [caMethod(TcaMethod.POST)]
-  [caParameterType(TcaParameterType.QueryString)]
-  TtgSendVideoNoteArgument = record
-  public
-    [caName('chat_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    ChatId: TtgUserLink;
-    [caName('video_note')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    /// <summary>
-    /// Audio file to send. Pass a file_id as String to send an animation that exists on
-    /// the Telegram servers (recommended), pass an HTTP URL as a String for Telegram
-    /// to get a file from the Internet, or upload a new one using
-    /// multipart/form-data. More info on Sending Files »
-    /// </summary>
-    VideoNote: TcaFileToSend;
-    /// <summary>Duration of the voice message in seconds</summary>
-    [caName('duration')]
-    [caDefaultValueInt64(0)]
-    Duration: Int64;
-    [caName('length')]
-    [caDefaultValueInt64(0)]
-    Length: Int64;
-    [caName('thumb')]
-    [caDefaultValueString('')]
-    /// <summary>Thumbnail of the file sent; can be ignored if thumbnail generation for
-    /// the file is supported server-side. The thumbnail should be in JPEG format and
-    /// less than 200 kB in size. A thumbnail‘s width and height should not exceed 320.
-    /// Ignored if the file is not uploaded using multipart/form-data. Thumbnails can’t
-    /// be reused and can be only uploaded as a new file, so you can pass “attach:
-    /// file_attach_name” if the thumbnail was uploaded using multipart/form-data
-    /// under file_attach_name. More info on Sending Files »</summary>
-    Thumb: TcaFileToSend;
-    [caDefaultValueBoolean(False)]
-    [caName('disable_notification')]
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.</summary>
-    DisableNotification: Boolean;
-    [caName('reply_to_message_id')]
-    [caDefaultValueInt64(0)]
-    /// <summary>If the message is a reply, ID of the original message</summary>
-    ReplyToMessageId: Int64;
-    class function Default: TtgSendVideoNoteArgument; static;
-  end;
-
-  /// <summary>
-  /// </summary>
-  [caName('sendVenue')]
-  [caMethod(TcaMethod.POST)]
-  [caParameterType(TcaParameterType.QueryString)]
-  TtgSendVenueArgument = record
-  public
-    [caName('chat_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    ChatId: TtgUserLink;
-    [caName('latitude')]
-    [caIsRequaired]
-    [caDefaultValueSingle(0)]
-    /// <summary>
-    /// Latitude of the venue
-    /// </summary>
-    Latitude: Single;
-    [caName('longitude')]
-    [caIsRequaired]
-    [caDefaultValueSingle(0)]
-    /// <summary>
-    /// Longitude of the venue
-    /// </summary>
-    Longitude: Single;
-
-    [caName('title')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    /// <summary>
-    /// Name of the venue
-    /// </summary>
-    Title: string;
-
-    [caName('address')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    /// <summary>
-    /// Address of the venue
-    /// </summary>
-    Address: string;
-
-    [caName('foursquare_id')]
-    [caDefaultValueString('')]
-    /// <summary>
-    /// Foursquare identifier of the venue
-    /// </summary>
-    FoursquareId: string;
-
-    [caName('foursquare_type')]
-    [caDefaultValueString('')]
-    /// <summary>
-    /// Foursquare type of the venue, if known.
-    /// (For example, “arts_entertainment/default”, “arts_entertainment/aquarium”
-    /// or “food/icecream”.)
-    /// </summary>
-    FoursquareType: string;
-    [caDefaultValueBoolean(False)]
-    [caName('disable_notification')]
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.</summary>
-    DisableNotification: Boolean;
-    [caName('reply_to_message_id')]
-    [caDefaultValueInt64(0)]
-    /// <summary>If the message is a reply, ID of the original message</summary>
-    ReplyToMessageId: Int64;
-    class function Default: TtgSendVenueArgument; static;
-  end;
-
-  [caName('SendMediaGroup')]
-  [caMethod(TcaMethod.POST)]
-  [caParameterType(TcaParameterType.QueryString)]
-  TtgSendMediaGroupArgument = record
-  public
-    [caName('chat_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    ChatId: TtgUserLink;
-    [caName('media')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    [caParameterType(TcaParameterType.GetOrPost)]
-    /// <summary>
-    /// Audio file to send. Pass a file_id as String to send an animation that exists on
-    /// the Telegram servers (recommended), pass an HTTP URL as a String for Telegram
-    /// to get a file from the Internet, or upload a new one using
-    /// multipart/form-data. More info on Sending Files »
-    /// </summary>
-    Media: TArray<TtgInputMedia>;
-    [caDefaultValueBoolean(False)]
-    [caName('disable_notification')]
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.</summary>
-    DisableNotification: Boolean;
-    [caName('reply_to_message_id')]
-    [caDefaultValueInt64(0)]
-    /// <summary>If the message is a reply, ID of the original message</summary>
-    ReplyToMessageId: Int64;
-    class function Default: TtgSendMediaGroupArgument; static;
-  end;
-
-  /// <summary> Use this method to send point on the map. On success, the sent
-  /// Message is returned.
-  /// </summary>
-  [caName('sendLocation')]
-  [caParameterType(TcaParameterType.QueryString)]
-  TtgSendLocationArgument = record
-  public
-    [caName('chat_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    ChatId: TtgUserLink;
-    [caName('latitude')]
-    [caIsRequaired]
-    [caDefaultValueSingle(0.0)]
-    /// <summary> Latitude of the location</summary>
-    Latitude: Single;
-    [caName('longitude')]
-    [caIsRequaired]
-    [caDefaultValueSingle(0.0)]
-    /// <summary> Longitude of the location</summary>
-    Longitude: Single;
-    /// <summary>Period in seconds for which the location will be updated (see Live
-    /// Locations, should be between 60 and 86400.</summary>
-    [caName('live_period')]
-    [caDefaultValueInt64(0)]
-    LivePeriod: Int64;
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.</summary>
-    DisableNotification: Boolean;
-    [caName('reply_to_message_id')]
-    [caDefaultValueInt64(0)]
-    /// <summary>If the message is a reply, ID of the original message</summary>
-    ReplyToMessageId: Int64;
-    class function Default: TtgSendLocationArgument; static;
-  end;
 
   [caName('editMessageLiveLocation')]
   [caParameterType(TcaParameterType.QueryString)]
@@ -652,140 +352,6 @@ type
     property FileId: string read FFileId write FFileId;
   end;
 
-  [caName('sendPoll')]
-  [caMethod(TcaMethod.GET)]
-  [caParameterType(TcaParameterType.QueryString)]
-  TtgSendPollArgument = record
-  public
-    [caName('chat_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    ChatId: TtgUserLink;
-    [caName('question')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    /// <summary>
-    /// Poll question, 1-255 characters
-    /// </summary>
-    Question: string;
-    [caName('options')]
-    [caIsRequaired]
-    [caDefaultValueString('[]')]
-    /// <summary>
-    /// A JSON-serialized list of answer options, 2-10 strings 1-100 characters each
-    /// </summary>
-    Options: TArray<string>;
-    [caName('is_anonymous')]
-    [caDefaultValueBoolean(True)]
-    /// <summary>
-    /// True, if the poll needs to be anonymous, defaults to True
-    /// </summary>
-    IsAnonymous: Boolean;
-    [caName('type')]
-    [caDefaultValueString('regular')]
-    /// <summary>
-    /// Poll type, “quiz” or “regular”, defaults to “regular”
-    /// </summary>
-    &Type: string;
-    [caName('allows_multiple_answers')]
-    [caDefaultValueBoolean(False)]
-    /// <summary>
-    /// True, if the poll allows multiple answers, ignored for polls in quiz mode, defaults to False
-    /// </summary>
-    AllowsMultipleAnswers: Boolean;
-    [caName('correct_option_id')]
-    [caDefaultValueInt64(0)]
-    /// <summary>
-    /// True, if the poll allows multiple answers, ignored for polls in quiz mode, defaults to False
-    /// </summary>
-    CorrectOptionId: Integer;
-    [caName('explanation')]
-    [caDefaultValueString('')]
-    /// <summary>
-    /// Text that is shown when a user chooses an incorrect answer
-    /// or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most 2 line feeds after entities parsing
-    /// </summary>
-    Explanation: string;
-    [caName('explanation_parse_mode')]
-    [caDefaultValueString('')]
-    /// <summary>Mode for parsing entities in the explanation. See formatting options for more details.</summary>
-    ExplanationParseMode: TtgParseMode;
-    [caName('open_period')]
-    [caDefaultValueInt64(0)]
-    /// <summary>
-    /// Amount of time in seconds the poll will be active after creation, 5-600. Can't
-    /// be used together with close_date.
-    /// </summary>
-    OpenPeriod: Integer;
-    [caName('close_date')]
-    [caDefaultValueInt64(0)]
-    /// <summary>
-    /// Point in time (Unix timestamp) when the poll will be automatically closed.
-    /// Must be at least 5 and no more than 600 seconds in the future. Can't be used together with open_period.
-    /// </summary>
-    CloseDate: Integer;
-    [caDefaultValueBoolean(False)]
-    [caName('is_closed')]
-    /// <summary>
-    /// Pass True, if the poll needs to be immediately closed. This can be useful for poll preview.
-    /// </summary>
-    IsClosed: Boolean;
-    [caDefaultValueBoolean(False)]
-    [caName('disable_notification')]
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.
-    /// </summary>
-    DisableNotification: Boolean;
-    [caName('reply_to_message_id')]
-    [caDefaultValueInt64(0)]
-    /// <summary>If the message is a reply, ID of the original message</summary>
-    ReplyToMessageId: Int64;
-    class function Default: TtgSendPollArgument; static;
-  end;
-
-  /// <summary>
-  /// Use this method to send an animated emoji that will display a random value. On
-  /// success, the sent Message is returned.
-  /// </summary>
-  [caName('sendDice')]
-  [caMethod(TcaMethod.GET)]
-  [caParameterType(TcaParameterType.QueryString)]
-  TtgSendDiceArgument = class
-  private
-    [caName('chat_id')]
-    [caIsRequaired]
-    [caDefaultValueInt64(0)]
-    FChatId: TtgUserLink;
-    [caName('emoji')]
-    [caDefaultValueString('🎲')]
-    FEmoji: string;
-    [caDefaultValueBoolean(False)]
-    [caName('disable_notification')]
-    FDisableNotification: Boolean;
-    [caName('reply_to_message_id')]
-    [caDefaultValueInt64(0)]
-    FReplyToMessageId: Int64;
-  public
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    property ChatId: TtgUserLink read FChatId write FChatId;
-    /// <summary> Emoji on which the dice throw animation is based. Currently, must be
-    /// one of “🎲”, “🎯”, “🏀”, “⚽”, “🎳”, or “🎰”. Dice can have values 1-6 for “🎲”,
-    /// “🎯” and “🎳”, values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”. Defaults
-    /// to “🎲”
-    /// </summary>
-    property Emoji: string read FEmoji write FEmoji;
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.
-    /// </summary>
-    property DisableNotification: Boolean read FDisableNotification write FDisableNotification;
-    /// <summary>If the message is a reply, ID of the original message</summary>
-    property ReplyToMessageId: Int64 read FReplyToMessageId write FReplyToMessageId;
-    constructor Create;
-  end;
-
   /// <summary> Use this method to unban a previously kicked user in a supergroup or
   /// channel. The user will not return to the group or channel automatically, but
   /// will be able to join via link, etc. The bot must be an administrator for this
@@ -998,9 +564,9 @@ type
     [caName('can_delete_messages')]
     [caDefaultValueBoolean(False)]
     FCanDeleteMessages: Boolean;
-    [caName('can_manage_voice_chats')]
+    [caName('can_manage_video_chats')]
     [caDefaultValueBoolean(False)]
-    FCanManageVoiceChats: Boolean;
+    FCanManageVideoChats: Boolean;
     [caName('can_restrict_members')]
     [caDefaultValueBoolean(False)]
     FCanRestrictMembers: Boolean;
@@ -1042,8 +608,8 @@ type
     /// <summary>Pass True, if the administrator can delete messages of other
     /// users</summary>
     property CanDeleteMessages: Boolean read FCanDeleteMessages write FCanDeleteMessages;
-    /// <summary>Pass True, if the administrator can manage voice chats</summary>
-    property CanManageVoiceChats: Boolean read FCanManageVoiceChats write FCanManageVoiceChats;
+    /// <summary>Pass True, if the administrator can manage video chats</summary>
+    property CanManageVideoChats: Boolean read FCanManageVideoChats write FCanManageVideoChats;
     /// <summary> Pass True, if the administrator can restrict, ban or unban chat
     /// members</summary>
     property CanRestrictMembers: Boolean read FCanRestrictMembers write FCanRestrictMembers;
@@ -1106,205 +672,6 @@ type
     /// </summary>
     property RevokeMessages: Boolean read FRevokeMessages write FRevokeMessages;
     constructor Create;
-  end;
-
-  /// <summary>
-  /// Use this method to send invoices. On success, the sent Message is returned.
-  /// </summary>
-  TtgSendInvoiceArgument = class(TtgSendMessageBase)
-  private
-    [caName('title')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    fTitle: string;
-    [caName('description')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    FDescription: string;
-    [caName('payload')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    FPayload: string;
-    [caName('provider_token')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    FProviderToken: string;
-    [caName('currency')]
-    [caIsRequaired]
-    [caDefaultValueString('')]
-    FCurrency: string;
-    [caName('prices')]
-    [caIsRequaired]
-    [caDefaultValueString('[]')]
-    FPrices: TArray<TtgLabeledPrice>;
-    [caName('max_tip_amount')]
-    [caDefaultValueInt(0)]
-    FMaxTipAmount: Integer;
-    [caName('suggested_tip_amounts')]
-    [caDefaultValueString('[]')]
-    FSuggestedTipAmounts: TArray<Integer>;
-    [caName('start_parameter')]
-    [caDefaultValueString('')]
-    FStartParameter: string;
-    [caName('provider_data')]
-    [caDefaultValueString('')]
-    FProviderData: string;
-    [caName('photo_url')]
-    [caDefaultValueString('')]
-    FPhotoUrl: string;
-    [caName('photo_size')]
-    [caDefaultValueInt(0)]
-    FPhotoSize: Integer;
-    [caName('photo_width')]
-    [caDefaultValueInt(0)]
-    FPhotoWidth: Integer;
-    [caName('photo_height')]
-    [caDefaultValueInt(0)]
-    FPhotoHeight: Integer;
-    [caName('need_name')]
-    [caDefaultValueBoolean(False)]
-    FNeedName: Boolean;
-    [caName('need_phone_number')]
-    [caDefaultValueBoolean(False)]
-    FNeedPhoneNumber: Boolean;
-    [caName('need_email')]
-    [caDefaultValueBoolean(False)]
-    FNeedEmail: Boolean;
-    [caName('need_shipping_address')]
-    [caDefaultValueBoolean(False)]
-    FNeedShippingAddress: Boolean;
-    [caName('send_phone_number_to_provider')]
-    [caDefaultValueBoolean(False)]
-    FSendPhoneNumberToProvider: Boolean;
-    [caName('send_email_to_provider')]
-    [caDefaultValueBoolean(False)]
-    FSendEmailToProvider: Boolean;
-    [caName('is_flexible')]
-    [caDefaultValueBoolean(False)]
-    FIsFlexible: Boolean;
-  public
-    /// <summary>Unique identifier for the target chat or username of the target
-    /// channel (in the format @channelusername)</summary>
-    property ChatId;
-    /// <summary>
-    /// Product name, 1-32 characters
-    /// </summary>
-    property Title: string read fTitle write fTitle;
-    /// <summary>
-    /// Product description, 1-255 characters
-    /// </summary>
-    property Description: string read FDescription write FDescription;
-    /// <summary>
-    /// Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the
-    /// user, use for your internal processes.
-    /// </summary>
-    property Payload: string read FPayload write FPayload;
-    /// <summary>
-    /// Payments provider token, obtained via Botfather
-    /// </summary>
-    property ProviderToken: string read FProviderToken write FProviderToken;
-    /// <summary>
-    /// Three-letter ISO 4217 currency code, see more on currencies
-    /// </summary>
-    property Currency: string read FCurrency write FCurrency;
-    /// <summary>
-    /// Price breakdown, a JSON-serialized list of components (e.g. product price, tax,
-    /// discount, delivery cost, delivery tax, bonus, etc.)
-    /// </summary>
-    property Prices: TArray<TtgLabeledPrice> read FPrices write FPrices;
-    /// <summary>
-    /// The maximum accepted amount for tips in the smallest units of the currency (
-    /// integer, not float/double). For example, for a maximum tip of US$ 1.45 pass
-    /// max_tip_amount = 145. See the exp parameter in currencies.json, it shows the
-    /// number of digits past the decimal point for each currency (2 for the majority
-    /// of currencies). Defaults to 0
-    /// </summary>
-    property MaxTipAmount: Integer read FMaxTipAmount write FMaxTipAmount;
-    /// <summary>
-    /// A JSON-serialized array of suggested amounts of tips in the smallest units of
-    /// the currency (integer, not float/double). At most 4 suggested tip amounts can
-    /// be specified. The suggested tip amounts must be positive, passed in a strictly
-    /// increased order and must not exceed max_tip_amount.
-    /// </summary>
-    property SuggestedTipAmounts: TArray<Integer> read FSuggestedTipAmounts write FSuggestedTipAmounts;
-    /// <summary>
-    /// Unique deep-linking parameter. If left empty, forwarded copies of the sent
-    /// message will have a Pay button, allowing multiple users to pay directly from
-    /// the forwarded message, using the same invoice. If non-empty, forwarded copies
-    /// of the sent message will have a URL button with a deep link to the bot (instead
-    /// of a Pay button), with the value used as the start parameter
-    /// </summary>
-    property StartParameter: string read FStartParameter write FStartParameter;
-    /// <summary>
-    /// A JSON-serialized data about the invoice, which will be shared with the payment
-    /// provider. A detailed description of required fields should be provided by the
-    /// payment provider.
-    /// </summary>
-    property ProviderData: string read FProviderData write FProviderData;
-    /// <summary>
-    /// URL of the product photo for the invoice. Can be a photo of the goods or a
-    /// marketing image for a service. People like it better when they see what they
-    /// are paying for.
-    /// </summary>
-    property PhotoUrl: string read FPhotoUrl write FPhotoUrl;
-    /// <summary>
-    /// Photo size
-    /// </summary>
-    property PhotoSize: Integer read FPhotoSize write FPhotoSize;
-    /// <summary>
-    /// Photo width
-    /// </summary>
-    property PhotoWidth: Integer read FPhotoWidth write FPhotoWidth;
-    /// <summary>
-    /// Photo height
-    /// </summary>
-    property PhotoHeight: Integer read FPhotoHeight write FPhotoHeight;
-    /// <summary>
-    /// Pass True, if you require the user's full name to complete the order
-    /// </summary>
-    property NeedName: Boolean read FNeedName write FNeedName;
-    /// <summary>
-    /// Pass True, if you require the user's phone number to complete the order
-    /// </summary>
-    property NeedPhoneNumber: Boolean read FNeedPhoneNumber write FNeedPhoneNumber;
-    /// <summary>
-    /// Pass True, if you require the user's email address to complete the order
-    /// </summary>
-    property NeedEmail: Boolean read FNeedEmail write FNeedEmail;
-    /// <summary>
-    /// Pass True, if you require the user's shipping address to complete the order
-    /// </summary>
-    property NeedShippingAddress: Boolean read FNeedShippingAddress write FNeedShippingAddress;
-    /// <summary>
-    /// Pass True, if user's phone number should be sent to provider
-    /// </summary>
-    property SendPhoneNumberToProvider: Boolean read FSendPhoneNumberToProvider write FSendPhoneNumberToProvider;
-    /// <summary>
-    /// Pass True, if user's email address should be sent to provider
-    /// </summary>
-    property SendEmailToProvider: Boolean read FSendEmailToProvider write FSendEmailToProvider;
-
-    /// <summary>
-    /// Pass True, if the final price depends on the shipping method
-    /// </summary>
-    property IsFlexible: Boolean read FIsFlexible write FIsFlexible;
-
-    /// <summary>Sends the message silently. Users will receive a notification with no
-    /// sound.</summary>
-    property DisableNotification;
-    /// <summary>
-    /// If the message is a reply, ID of the original message
-    /// </summary>
-    property ReplyToMessageId;
-    /// <summary>
-    /// Pass True, if the message should be sent even if the specified replied-to
-    /// message is not found
-    /// </summary>
-    property AllowSendingWithoutReply;
-    /// <summary>
-    /// A JSON-serialized object for an keyboard
-    /// </summary>
-    property ReplyMarkup;
   end;
 
   /// <summary> Use this method to get the current list of the bot's commands for the
@@ -1439,26 +806,108 @@ type
     property CacheTime: Integer read FCacheTime write FCacheTime;
   end;
 
+  /// <summary> Use this method to get the current default administrator rights of
+  /// the bot. Returns ChatAdministratorRights on success.
+  /// </summary>
+  TtgGetMyDefaultAdministratorRightsArgument = class
+  private
+    [caName('for_channels')]
+    [caDefaultValueBoolean(False)]
+    FForChannels: Boolean;
+  public
+    /// <summary> Pass True to get default administrator rights of the bot in channels.
+    /// Otherwise, default administrator rights of the bot for groups and supergroups
+    /// will be returned.
+    /// </summary>
+    property ForChannels: Boolean read FForChannels write FForChannels;
+  end;
+
+/// <summary>
+  /// Use this method to change the default administrator rights requested by the bot
+  /// when it's added as an administrator to groups or channels. These rights will be
+  /// suggested to users, but they are are free to modify the list before adding the
+  /// bot. Returns True on success.
+  /// </summary>
+  TtgSetMyDefaultAdministratorRightsArgument = class(TtgGetMyDefaultAdministratorRightsArgument)
+  private
+    [caName('rights')]
+    [caDefaultValueString('{}')]
+    FRights: TtgChatAdministratorRights;
+  public
+    /// <summary>
+    /// A JSON-serialized object describing new default administrator rights. If not
+    /// specified, the default administrator rights will be cleared.
+    /// </summary>
+    property Rights: TtgChatAdministratorRights read FRights write FRights;
+    /// <summary>
+    /// Pass True to change the default administrator rights of the bot in channels.
+    /// Otherwise, the default administrator rights of the bot for groups and
+    /// supergroups will be changed.
+    /// </summary>
+    property ForChannels;
+  end;
+
+  /// <summary>
+  /// Use this method to change the bot's menu button in a private chat, or the
+  /// default menu button. Returns True on success.
+  /// </summary>
+  TtgSetChatMenuButtonArgument = record
+  private
+    [caName('chat_id')]
+    [caDefaultValueInt64(0)]
+    FChatId: TtgUserLink;
+    [caName('menu_button')]
+    FMenuButton: TtgMenuButtonAbstract;
+  public
+    /// <summary>Unique identifier for the target private chat. If not specified,
+    /// default bot's menu button will be changed</summary>
+    property ChatId: TtgUserLink read FChatId write FChatId;
+    /// <summary>
+    /// A JSON-serialized object for the new bot's menu button. Defaults to
+    /// MenuButtonDefault
+    /// </summary>
+    property MenuButton: TtgMenuButtonAbstract read FMenuButton write FMenuButton;
+  end;
+
+  /// <summary>Use this method to get the current value of the bot's menu button in a
+  /// private chat, or the default menu button. Returns MenuButton on success.
+  /// </summary>
+  TtgGetChatMenuButtonArgument = record
+  private
+    [caName('chat_id')]
+    [caDefaultValueInt64(0)]
+    FChatId: TtgUserLink;
+  public
+    /// <summary>Unique identifier for the target private chat. If not specified,
+    /// default bot's menu button will be returned</summary>
+    property ChatId: TtgUserLink read FChatId write FChatId;
+  end;
+
+  /// <summary>
+  /// Use this method to set the result of an interaction with a Web App and send a
+  /// corresponding message on behalf of the user to the chat from which the query
+  /// originated. On success, a SentWebAppMessage object is returned.
+  /// </summary>
+  TTgAnswerWebAppQueryArgument = record
+  private
+    [caName('result')]
+    [caName('web_app_query_id')]
+    FWebAppQueryId: string;
+    FResult: TtgInlineQueryResult;
+  public
+    /// <summary>
+    /// Unique identifier for the query to be answered
+    /// </summary>
+    property WebAppQueryId: string read FWebAppQueryId write FWebAppQueryId;
+    /// <summary>
+    /// A JSON-serialized object describing the message to be sent
+    /// </summary>
+    property Result: TtgInlineQueryResult read FResult write FResult;
+  end;
+
 implementation
 
 uses System.SysUtils;
-
-{ TtgForwardMessageArgument }
-
-constructor TtgForwardMessageArgument.Create;
-begin
-  inherited Create;
-  ChatId := TtgUserLink.Empty;
-  FromChatId := TtgUserLink.Empty;
-  DisableNotification := False;
-  FMessageID := 0;
-end;
-
-destructor TtgForwardMessageArgument.Destroy;
-begin
-
-  inherited;
-end;
 
 { TtgGetUpdatesArgument }
 
@@ -1470,79 +919,11 @@ begin
   Result.AllowedUpdates := UPDATES_ALLOWED_ALL;
 end;
 
-{ TtgSendVideoNoteArgument }
-
-class function TtgSendVideoNoteArgument.Default: TtgSendVideoNoteArgument;
-begin
-  Result.ChatId := 0;
-  Result.VideoNote := TcaFileToSend.Empty;
-  Result.Duration := 0;
-  Result.Length := 0;
-  Result.Thumb := TcaFileToSend.Empty;
-  Result.DisableNotification := False;
-  Result.ReplyToMessageId := 0;
-end;
-
-{ TtgSendMediaGroupArgument }
-
-class function TtgSendMediaGroupArgument.Default: TtgSendMediaGroupArgument;
-begin
-
-end;
-
 { TtgGetChatArgument }
 
 class function TtgGetChatArgument.Default: TtgGetChatArgument;
 begin
   Result.ChatId := 0;
-end;
-
-{ TtgSendVenueArgument }
-
-class function TtgSendVenueArgument.Default: TtgSendVenueArgument;
-begin
-  Result.ChatId := TtgUserLink.Empty;
-  Result.Latitude := 0;
-  Result.Longitude := 0;
-  Result.Title := '';
-  Result.Address := '';
-  Result.FoursquareId := '';
-  Result.FoursquareType := '';
-  Result.DisableNotification := False;
-  Result.ReplyToMessageId := 0;
-end;
-
-{ TtgSendContactArgument }
-
-class function TtgSendContactArgument.Default: TtgSendContactArgument;
-begin
-  Result.ChatId := TtgUserLink.Empty;
-  Result.PhoneNumber := '';
-  Result.FirstName := '';
-  Result.LastName := '';
-  Result.VCard := '';
-  Result.DisableNotification := False;
-  Result.ReplyToMessageId := 0;
-end;
-
-{ TtgSendPollArgument }
-
-class function TtgSendPollArgument.Default: TtgSendPollArgument;
-begin
-  Result.ChatId := TtgUserLink.Empty;
-  Result.Question := '';
-  Result.Options := [];
-  Result.IsAnonymous := True;
-  Result.&Type := 'regular';
-  Result.AllowsMultipleAnswers := False;
-  Result.CorrectOptionId := 0;
-  Result.Explanation := '';
-  Result.ExplanationParseMode := TtgParseMode.Default;
-  Result.OpenPeriod := 0;
-  Result.CloseDate := 0;
-  Result.IsClosed := False;
-  Result.DisableNotification := False;
-  Result.ReplyToMessageId := 0;
 end;
 
 { TtgSetWebhookArgument }
@@ -1569,18 +950,6 @@ end;
 class function TtgGetWebhookInfoArgument.Default: TtgGetWebhookInfoArgument;
 begin
 
-end;
-
-{ TtgSendLocationArgument }
-
-class function TtgSendLocationArgument.Default: TtgSendLocationArgument;
-begin
-  Result.ChatId := TtgUserLink.Empty;
-  Result.Latitude := 0.0;
-  Result.Longitude := 0.0;
-  Result.LivePeriod := 0;
-  Result.DisableNotification := False;
-  Result.ReplyToMessageId := 0;
 end;
 
 { TtgEditMessageLiveLocationHaveInlineMessageIDArgument }
@@ -1619,32 +988,11 @@ begin
   Result.InlineMessageId := 0;
 end;
 
-{ TtgSendDiceArgument }
-
-constructor TtgSendDiceArgument.Create;
-begin
-  FChatId := TtgUserLink.Empty;
-  FEmoji := '🎲';
-  FDisableNotification := False;
-  FReplyToMessageId := 0;
-end;
-
 { TtgExportChatInviteLinkArgument }
 
 class function TtgExportChatInviteLinkArgument.Default: TtgExportChatInviteLinkArgument;
 begin
   Result.ChatId := TtgUserLink.Empty;
-end;
-
-{ TtgCopyMessageArgument }
-
-constructor TtgCopyMessageArgument.Create;
-begin
-  inherited Create();
-  FFromChatId := TtgUserLink.Empty;
-  FMessageID := 0;
-  FCaption := '';
-  FCaptionEntities := nil;
 end;
 
 { TtgUnbanChatMemberArgument }

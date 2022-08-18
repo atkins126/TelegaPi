@@ -1,21 +1,50 @@
-﻿unit TelegramBotApi.Client;
+﻿{***************************************************************************}
+{                                                                           }
+{           TelegaPi                                                        }
+{                                                                           }
+{           Copyright (C) 2021 Maxim Sysoev                                 }
+{                                                                           }
+{           https://t.me/CloudAPI                                           }
+{                                                                           }
+{                                                                           }
+{***************************************************************************}
+{                                                                           }
+{  Licensed under the Apache License, Version 2.0 (the "License");          }
+{  you may not use this file except in compliance with the License.         }
+{  You may obtain a copy of the License at                                  }
+{                                                                           }
+{      http://www.apache.org/licenses/LICENSE-2.0                           }
+{                                                                           }
+{  Unless required by applicable law or agreed to in writing, software      }
+{  distributed under the License is distributed on an "AS IS" BASIS,        }
+{  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. }
+{  See the License for the specific language governing permissions and      }
+{  limitations under the License.                                           }
+{                                                                           }
+{***************************************************************************}
+
+unit TelegramBotApi.Client;
 
 interface
 
 uses
-  TelegramBotApi.Types,
-  TelegramBotApi.Types.Request,
-  TelegramBotApi.Types.AvailableMethods,
-  TelegramBotApi.Types.UpdatingMessages,
+  CloudApi.Client.Sync,
   CloudApi.IAuthenticator,
   CloudApi.Request,
-  CloudApi.Client.Sync,
-  System.Classes;
+  System.Classes,
+  TelegramBotApi.Request.Stickers,
+  TelegramBotApi.Types,
+  TelegramBotApi.Types.AvailableMethods,
+  TelegramBotApi.Types.Games,
+  TelegramBotApi.Types.Payments,
+  TelegramBotApi.Types.Request,
+  TelegramBotApi.Types.UpdatingMessages,
+  TelegramBotApi.Types.WebApps;
 
 type
   TTelegramBotApi = class(TPersistent)
   public const
-    LIB_VERSION = '5.1.0';
+    LIB_VERSION = '6.0.0';
   private
     FCloudApi: TCloudApiClient;
     FBotToken: string;
@@ -35,6 +64,12 @@ type
     function SetWebhook(SetWebhookArgument: TtgSetWebhookArgument): Boolean;
     function DeleteWebhook(ADeleteWebhook: TtgDeleteWebhookArgument): Boolean;
     function GetWebhookInfo(): ItgResponse<TtgWebhookInfo>; overload;
+{$ENDREGION}
+{$REGION 'Games'}
+    /// <summary>
+    /// Use this method to send a game. On success, the sent Message is returned.
+    /// </summary>
+    function SendGame(ASendGameArgument: TtgSendGameArgument): ItgResponse<TtgMessage>;
 {$ENDREGION}
 {$REGION 'Available methods'}
     /// <summary>
@@ -72,7 +107,7 @@ type
     /// to the method forwardMessages, but the copied message doesn't have a link to
     /// the original message. Returns the MessageId of the sent message on success.
     /// </summary>
-    function CopyMessage(ACopyMessageArgument: TtgCopyMessageArgument): ItgResponse<Int64>;
+    function CopyMessage(ACopyMessageArgument: TtgCopyMessageArgument): ItgResponse<TtgMessageId>;
     /// <summary>
     /// Use this method to send photos. On success, the sent Message is returned.
     /// </summary>
@@ -264,6 +299,12 @@ type
     /// Use this method to send invoices. On success, the sent Message is returned.
     /// </summary>
     function SendInvoice(ASendInvoiceArgument: TtgSendInvoiceArgument): ItgResponse<TtgMessage>;
+    /// <summary> If you sent an invoice requesting a shipping address and the
+    /// parameter is_flexible was specified, the Bot API will send an Update with a
+    /// shipping_query field to the bot. Use this method to reply to shipping queries.
+    /// On success, True is returned.
+    /// </summary>
+    function AnswerShippingQuery(AAnswerShippingQuery: TtgAnswerShippingQuery): ItgResponse<Boolean>;
 {$ENDREGION}
 {$REGION 'Updating messages'}
     /// <summary>
@@ -317,6 +358,54 @@ type
     /// that open your bot with a parameter.
     /// </remarks>
     function AnswerCallbackQuery(AAnswerCallbackQuery: TtgAnswerCallbackQueryArgument): ItgResponse<Boolean>;
+    /// <summary>
+    /// Use this method to send static .WEBP or animated .TGS stickers. On success, the sent Message is returned.
+    /// </summary>
+    function SendSticker(ASticker: TtgSendStickerArgument): ItgResponse<TtgMessage>;
+    /// <summary>
+    /// Use this method to create a new sticker set owned by a user. The bot will be
+    /// able to edit the sticker set thus created. You must use exactly one of the
+    /// fields png_sticker, tgs_sticker, or webm_sticker. Returns True on success.
+    /// </summary>
+    function CreateNewStickerSet(AStickerSet: TtgCreateNewStickerSet): ItgResponse<Boolean>;
+    /// <summary> Use this method to add a new sticker to a set created by the bot. You
+    /// must use exactly one of the fields png_sticker, tgs_sticker, or webm_sticker.
+    /// Animated stickers can be added to animated sticker sets and only to them.
+    /// Animated sticker sets can have up to 50 stickers. Static sticker sets can have
+    /// up to 120 stickers. Returns True on success.</summary>
+    function AddStickerToSet(ASticker: TtgAddStickerToSet): ItgResponse<Boolean>;
+
+    /// <summary>
+    /// Use this method to change the default administrator rights requested by the bot
+    /// when it's added as an administrator to groups or channels. These rights will be
+    /// suggested to users, but they are are free to modify the list before adding the
+    /// bot. Returns True on success.
+    /// </summary>
+    function SetMyDefaultAdministratorRights(ASetMyDefaultAdministratorRightsArgument
+      : TtgSetMyDefaultAdministratorRightsArgument): ItgResponse<Boolean>;
+    /// <summary>
+    /// Use this method to get the current default administrator rights of the bot.
+    /// Returns ChatAdministratorRights on success.
+    /// </summary>
+    function GetMyDefaultAdministratorRights(AGetMyDefaultAdministratorRightsArgument
+      : TtgGetMyDefaultAdministratorRightsArgument): ItgResponse<TtgChatAdministratorRights>;
+    /// <summary>
+    /// Use this method to change the bot's menu button in a private chat, or the
+    /// default menu button. Returns True on success.
+    /// </summary>
+    function SetChatMenuButton(ASetChatMenuButtonArgument: TtgSetChatMenuButtonArgument): ItgResponse<Boolean>;
+    /// <summary>
+    /// Use this method to get the current value of the bot's menu button in a private
+    /// chat, or the default menu button. Returns MenuButton on success.
+    /// </summary>
+    function GetChatMenuButton(AGetChatMenuButtonArgument: TtgGetChatMenuButtonArgument): ItgResponse<TtgMenuButton>;
+    /// <summary>
+    /// Use this method to set the result of an interaction with a Web App and send a
+    /// corresponding message on behalf of the user to the chat from which the query
+    /// originated. On success, a SentWebAppMessage object is returned.
+    /// </summary>
+    function AnswerWebAppQuery(AAnswerWebAppQueryArgument: TTgAnswerWebAppQueryArgument)
+      : ItgResponse<TtgSentWebAppMessage>;
     constructor Create; overload;
     constructor Create(const AToken: string); overload;
     destructor Destroy; override;
@@ -344,6 +433,7 @@ begin
   FCloudApi.HttpClient.SecureProtocols := [THTTPSecureProtocol.TLS12];
   TtgConverters.TelegramConverter;
   FCloudApi.BaseUrl := 'https://api.telegram.org/bot{token}';
+  FCloudApi.HttpClient.UserAgent := 'TelegaPi v.' + TTelegramBotApi.LIB_VERSION + ', ' + FCloudApi.HttpClient.UserAgent;
   FAutoFreeRequestArgument := False;
 end;
 
@@ -357,6 +447,11 @@ function TTelegramBotApi.CreateChatInviteLink(ACreateChatInviteLink: TtgCreateCh
   : ItgResponse<TtgChatInviteLink>;
 begin
   TryInternalExecute<TtgCreateChatInviteLinkArgument, TtgChatInviteLink>(ACreateChatInviteLink, Result);
+end;
+
+function TTelegramBotApi.CreateNewStickerSet(AStickerSet: TtgCreateNewStickerSet): ItgResponse<Boolean>;
+begin
+  TryInternalExecute<TtgCreateNewStickerSet, Boolean>(AStickerSet, Result);
 end;
 
 function TTelegramBotApi.DeleteMessage(ADeleteMessageeArgument: TtgDeleteMessageArgument): ItgResponse<Boolean>;
@@ -375,10 +470,26 @@ begin
   inherited Destroy;
 end;
 
+function TTelegramBotApi.AddStickerToSet(ASticker: TtgAddStickerToSet): ItgResponse<Boolean>;
+begin
+  TryInternalExecute<TtgAddStickerToSet, Boolean>(ASticker, Result);
+end;
+
 function TTelegramBotApi.AnswerCallbackQuery(AAnswerCallbackQuery: TtgAnswerCallbackQueryArgument)
   : ItgResponse<Boolean>;
 begin
   TryInternalExecute<TtgAnswerCallbackQueryArgument, Boolean>(AAnswerCallbackQuery, Result);
+end;
+
+function TTelegramBotApi.AnswerShippingQuery(AAnswerShippingQuery: TtgAnswerShippingQuery): ItgResponse<Boolean>;
+begin
+  TryInternalExecute<TtgAnswerShippingQuery, Boolean>(AAnswerShippingQuery, Result);
+end;
+
+function TTelegramBotApi.AnswerWebAppQuery(AAnswerWebAppQueryArgument: TTgAnswerWebAppQueryArgument)
+  : ItgResponse<TtgSentWebAppMessage>;
+begin
+  TryInternalExecute<TTgAnswerWebAppQueryArgument, TtgSentWebAppMessage>(AAnswerWebAppQueryArgument, Result);
 end;
 
 function TTelegramBotApi.Close: ItgResponse<Boolean>;
@@ -393,9 +504,9 @@ begin
   end;
 end;
 
-function TTelegramBotApi.CopyMessage(ACopyMessageArgument: TtgCopyMessageArgument): ItgResponse<Int64>;
+function TTelegramBotApi.CopyMessage(ACopyMessageArgument: TtgCopyMessageArgument): ItgResponse<TtgMessageId>;
 begin
-  TryInternalExecute<TtgCopyMessageArgument, Int64>(ACopyMessageArgument, Result);
+  TryInternalExecute<TtgCopyMessageArgument, TtgMessageId>(ACopyMessageArgument, Result);
 end;
 
 function TTelegramBotApi.EditChatInviteLink(AEditChatInviteLink: TtgEditChatInviteLinkArgument)
@@ -447,6 +558,12 @@ begin
   finally
     lGetChatMemberCount.Free;
   end;
+end;
+
+function TTelegramBotApi.GetChatMenuButton(AGetChatMenuButtonArgument: TtgGetChatMenuButtonArgument)
+  : ItgResponse<TtgMenuButton>;
+begin
+  TryInternalExecute<TtgGetChatMenuButtonArgument, TtgMenuButton>(AGetChatMenuButtonArgument, Result);
 end;
 
 function TTelegramBotApi.GetFile(AGetFile: TtgGetFileArgument): ItgResponse<TtgFile>;
@@ -555,6 +672,13 @@ begin
   TryInternalExecute<TtgEditMessageTextArgument, TtgMessage>(AEditMessageArgument, Result);
 end;
 
+function TTelegramBotApi.GetMyDefaultAdministratorRights(AGetMyDefaultAdministratorRightsArgument
+  : TtgGetMyDefaultAdministratorRightsArgument): ItgResponse<TtgChatAdministratorRights>;
+begin
+  TryInternalExecute<TtgGetMyDefaultAdministratorRightsArgument, TtgChatAdministratorRights>
+    (AGetMyDefaultAdministratorRightsArgument, Result);
+end;
+
 function TTelegramBotApi.LogOut: ItgResponse<Boolean>;
 var
   lLogOut: TtgLogOutArgunent;
@@ -608,6 +732,11 @@ begin
   TryInternalExecute<TtgSendDocumentArgument, TtgMessage>(ASendDocumentArgument, Result);
 end;
 
+function TTelegramBotApi.SendGame(ASendGameArgument: TtgSendGameArgument): ItgResponse<TtgMessage>;
+begin
+  TryInternalExecute<TtgSendGameArgument, TtgMessage>(ASendGameArgument, Result);
+end;
+
 function TTelegramBotApi.SendInvoice(ASendInvoiceArgument: TtgSendInvoiceArgument): ItgResponse<TtgMessage>;
 begin
   TryInternalExecute<TtgSendInvoiceArgument, TtgMessage>(ASendInvoiceArgument, Result);
@@ -650,6 +779,11 @@ begin
   TryInternalExecute<TtgSendPollArgument, TtgMessage>(ASendPollArgument, Result);
 end;
 
+function TTelegramBotApi.SendSticker(ASticker: TtgSendStickerArgument): ItgResponse<TtgMessage>;
+begin
+  TryInternalExecute<TtgSendStickerArgument, TtgMessage>(ASticker, Result);
+end;
+
 function TTelegramBotApi.SendVenue(ASendVenueArgument: TtgSendVenueArgument): ItgResponse<TtgMessage>;
 begin
   TryInternalExecute<TtgSendVenueArgument, TtgMessage>(ASendVenueArgument, Result);
@@ -679,9 +813,22 @@ begin
   end;
 end;
 
+function TTelegramBotApi.SetChatMenuButton(ASetChatMenuButtonArgument: TtgSetChatMenuButtonArgument)
+  : ItgResponse<Boolean>;
+begin
+  TryInternalExecute<TtgSetChatMenuButtonArgument, Boolean>(ASetChatMenuButtonArgument, Result);
+end;
+
 function TTelegramBotApi.SetMyCommands(ASetMyCommands: TtgSetMyCommandsArgument): ItgResponse<Boolean>;
 begin
   TryInternalExecute<TtgSetMyCommandsArgument, Boolean>(ASetMyCommands, Result);
+end;
+
+function TTelegramBotApi.SetMyDefaultAdministratorRights(ASetMyDefaultAdministratorRightsArgument
+  : TtgSetMyDefaultAdministratorRightsArgument): ItgResponse<Boolean>;
+begin
+  TryInternalExecute<TtgSetMyDefaultAdministratorRightsArgument, Boolean>
+    (ASetMyDefaultAdministratorRightsArgument, Result);
 end;
 
 function TTelegramBotApi.SetWebhook(SetWebhookArgument: TtgSetWebhookArgument): Boolean;

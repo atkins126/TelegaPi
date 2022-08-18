@@ -1,3 +1,28 @@
+{***************************************************************************}
+{                                                                           }
+{           TelegaPi                                                        }
+{                                                                           }
+{           Copyright (C) 2021 Maxim Sysoev                                 }
+{                                                                           }
+{           https://t.me/CloudAPI                                           }
+{                                                                           }
+{                                                                           }
+{***************************************************************************}
+{                                                                           }
+{  Licensed under the Apache License, Version 2.0 (the "License");          }
+{  you may not use this file except in compliance with the License.         }
+{  You may obtain a copy of the License at                                  }
+{                                                                           }
+{      http://www.apache.org/licenses/LICENSE-2.0                           }
+{                                                                           }
+{  Unless required by applicable law or agreed to in writing, software      }
+{  distributed under the License is distributed on an "AS IS" BASIS,        }
+{  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. }
+{  See the License for the specific language governing permissions and      }
+{  limitations under the License.                                           }
+{                                                                           }
+{***************************************************************************}
+
 unit TelegramBotApi.CloudAPI.Converter;
 
 interface
@@ -26,7 +51,9 @@ uses
   TelegramBotApi.Types,
   TelegramBotApi.Types.Enums,
   TelegramBotApi.Types.Helpers,
-  TelegramBotApi.Types.Keyboards;
+  TelegramBotApi.Types.Keyboards,
+  TelegramBotApi.Types.Payments,
+  TelegramBotApi.Types.WebApps;
 { TtgConverters }
 
 class procedure TtgConverters.TtgAllowedUpdatesConverter;
@@ -68,6 +95,9 @@ begin
   TcaRequestArgument.Current.RegisterToJson<TtgReplyKeyboardMarkup>;
   TcaRequestArgument.Current.RegisterToJson<TtgReplyKeyboardRemove>;
   TcaRequestArgument.Current.RegisterToJson<TtgForceReply>;
+  TcaRequestArgument.Current.RegisterToJson<TArray<TtgLabeledPrice>>;
+  TcaRequestArgument.Current.RegisterToJson<TtgChatAdministratorRights>;
+  TcaRequestArgument.Current.RegisterToJson<TtgMenuButtonAbstract>;
 end;
 
 class procedure TtgConverters.TtgParseModeConverter;
@@ -88,9 +118,7 @@ begin
         TtgParseMode.HTML:
           Result := 'HTML';
       else
-        begin
-          raise Exception.Create(TRttiEnumerationType.GetName(lVal));
-        end;
+        raise Exception.Create(TRttiEnumerationType.GetName(lVal));
       end;
     end);
 end;

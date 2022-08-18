@@ -23,47 +23,82 @@
 {                                                                           }
 {***************************************************************************}
 
-unit TelegramBotApi.CloudAPI.Authenticator;
+unit TelegramBotApi.Tools.UserDataStorage.Ram;
 
 interface
 
 uses
-  CloudAPI.IAuthenticator,
-  CloudAPI.Request;
+  System.Generics.Collections,
+  TelegramBotApi.Tools.UserDataStorage.Abstract;
 
 type
-  TTelegramAuthenticator = class(TInterfacedObject, IAuthenticator)
-  private
-    FBotToken: string;
-    function GetBotToken: string;
-    procedure SetBotToken(const Value: string);
+
+  TtgUserDataStorage = class(TtgUserDataStorageAbstract)
+  protected type
+    TData = TDictionary<Int64, TDictionary<string, string>>;
+  protected
+    FData: TData;
+    function GetData(const AID: Int64; const AKey: string): string; override;
+    procedure SetData(const AID: Int64; const AKey: string; const Value: string); override;
   public
-    constructor Create(const ABotToken: string);
-    procedure Authenticate(ARequest: IcaRequest);
-    property BotToken: string read GetBotToken write SetBotToken;
+    function Count: Integer;
+    constructor Create; virtual;
+    destructor Destroy; override;
+    function GetUsers: TArray<Int64>;
   end;
 
 implementation
 
-constructor TTelegramAuthenticator.Create(const ABotToken: string);
+{ TtgUserDataStorageRAM }
+
+function TtgUserDataStorage.Count: Integer;
 begin
-  inherited Create;
-  FBotToken := ABotToken;
+  Result := FData.Count;
 end;
 
-procedure TTelegramAuthenticator.Authenticate(ARequest: IcaRequest);
+constructor TtgUserDataStorage.Create;
 begin
-  ARequest.AddUrlSegment('token', FBotToken);
+  FData := TObjectDictionary < Int64, TDictionary < string, string >>.Create;
 end;
 
-function TTelegramAuthenticator.GetBotToken: string;
+destructor TtgUserDataStorage.Destroy;
 begin
-  Result := FBotToken;
+  FData.Free;
+  inherited;
 end;
 
-procedure TTelegramAuthenticator.SetBotToken(const Value: string);
+function TtgUserDataStorage.GetData(const AID: Int64; const AKey: string): string;
+var
+  LData: TDictionary<string, string>;
 begin
-  FBotToken := Value;
+  Result := '';
+  if not FData.TryGetValue(AID, LData) then
+  begin
+    LData := TDictionary<string, string>.Create;
+    FData.Add(AID, LData);
+  end;
+  if not LData.TryGetValue(AKey, Result) then
+  begin
+    LData.AddOrSetValue(AKey, Result);
+  end;
+end;
+
+function TtgUserDataStorage.GetUsers: TArray<Int64>;
+begin
+  for var LUser in FData do
+    Result := Result + [LUser.Key];
+end;
+
+procedure TtgUserDataStorage.SetData(const AID: Int64; const AKey, Value: string);
+var
+  LData: TDictionary<string, string>;
+begin
+  if not FData.TryGetValue(AID, LData) then
+  begin
+    LData := TDictionary<string, string>.Create;
+    FData.Add(AID, LData);
+  end;
+  LData.AddOrSetValue(AKey, Value);
 end;
 
 end.

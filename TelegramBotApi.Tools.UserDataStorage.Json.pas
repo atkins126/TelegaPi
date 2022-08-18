@@ -23,47 +23,67 @@
 {                                                                           }
 {***************************************************************************}
 
-unit TelegramBotApi.CloudAPI.Authenticator;
+unit TelegramBotApi.Tools.UserDataStorage.Json;
 
 interface
 
 uses
-  CloudAPI.IAuthenticator,
-  CloudAPI.Request;
+  TelegramBotApi.Tools.UserDataStorage.Ram,
+  System.Json.Serializers,
+  System.Generics.Collections;
 
 type
-  TTelegramAuthenticator = class(TInterfacedObject, IAuthenticator)
+  TtgUserDataStorage = class(TelegramBotApi.Tools.UserDataStorage.Ram.TtgUserDataStorage)
   private
-    FBotToken: string;
-    function GetBotToken: string;
-    procedure SetBotToken(const Value: string);
+    FSerializer: TJsonSerializer;
+    FFileName: string;
+  protected
+    procedure LoadFromFile(const AFileName: string);
+    procedure SaveToFile(const AFileName: string);
   public
-    constructor Create(const ABotToken: string);
-    procedure Authenticate(ARequest: IcaRequest);
-    property BotToken: string read GetBotToken write SetBotToken;
+    destructor Destroy; override;
+    constructor Create(const AFileName: string); reintroduce;
   end;
 
 implementation
 
-constructor TTelegramAuthenticator.Create(const ABotToken: string);
+uses
+  System.IOUtils,
+  System.Json.Types,
+  System.SysUtils;
+
+{ TtgUserDataStorageJson }
+
+constructor TtgUserDataStorage.Create(const AFileName: string);
 begin
   inherited Create;
-  FBotToken := ABotToken;
+  FSerializer := TJsonSerializer.Create;
+  FSerializer.Formatting := TJsonFormatting.Indented;
+  LoadFromFile(AFileName);
 end;
 
-procedure TTelegramAuthenticator.Authenticate(ARequest: IcaRequest);
+destructor TtgUserDataStorage.Destroy;
 begin
-  ARequest.AddUrlSegment('token', FBotToken);
+  SaveToFile(FFileName);
+  FSerializer.Free;
+  inherited Destroy;
 end;
 
-function TTelegramAuthenticator.GetBotToken: string;
+procedure TtgUserDataStorage.LoadFromFile(const AFileName: string);
+var
+  lFileSource: string;
 begin
-  Result := FBotToken;
+  FFileName := AFileName;
+  lFileSource := TFile.ReadAllText(AFileName);
+  FSerializer.Populate<TtgUserDataStorage.TData>(lFileSource, FData);
 end;
 
-procedure TTelegramAuthenticator.SetBotToken(const Value: string);
+procedure TtgUserDataStorage.SaveToFile(const AFileName: string);
+var
+  lFileSource: string;
 begin
-  FBotToken := Value;
+  lFileSource := FSerializer.Serialize<TtgUserDataStorage.TData>(FData);
+  TFile.WriteAllText(AFileName, lFileSource, TEncoding.UTF8);
 end;
 
 end.

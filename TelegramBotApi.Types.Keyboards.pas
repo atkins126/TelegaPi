@@ -1,10 +1,36 @@
-﻿unit TelegramBotApi.Types.Keyboards;
+﻿{***************************************************************************}
+{                                                                           }
+{           TelegaPi                                                        }
+{                                                                           }
+{           Copyright (C) 2021 Maxim Sysoev                                 }
+{                                                                           }
+{           https://t.me/CloudAPI                                           }
+{                                                                           }
+{                                                                           }
+{***************************************************************************}
+{                                                                           }
+{  Licensed under the Apache License, Version 2.0 (the "License");          }
+{  you may not use this file except in compliance with the License.         }
+{  You may obtain a copy of the License at                                  }
+{                                                                           }
+{      http://www.apache.org/licenses/LICENSE-2.0                           }
+{                                                                           }
+{  Unless required by applicable law or agreed to in writing, software      }
+{  distributed under the License is distributed on an "AS IS" BASIS,        }
+{  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. }
+{  See the License for the specific language governing permissions and      }
+{  limitations under the License.                                           }
+{                                                                           }
+{***************************************************************************}
+
+unit TelegramBotApi.Types.Keyboards;
 
 interface
 
 uses
   System.JSON.Serializers,
-  TelegramBotApi.JSON.Converter;
+  TelegramBotApi.JSON.Converter,
+  TelegramBotApi.Types.WebApps;
 
 type
 {$REGION 'Abstract'}
@@ -19,6 +45,7 @@ type
     function GetKeyboard: TArray<TArray<TtgButton>>; virtual; abstract;
     procedure SetKeyboard(AKeyboard: TArray < TArray < TtgButton >> ); virtual; abstract;
   public
+    constructor Create; virtual;
     procedure Clear;
     function RowCount: Integer; virtual;
     function ButtonsCount(const ARow: Integer): Integer; virtual;
@@ -50,6 +77,8 @@ type
     FRequestContact: Boolean;
     [JsonName('request_location')]
     FRequestLocation: Boolean;
+    [JsonName('web_app')]
+    FWebApp: TtgWebAppInfo;
     function GetText: string;
     procedure SetText(const Value: string);
   public
@@ -69,6 +98,12 @@ type
     /// pressed. Available in private chats only
     /// </summary>
     property RequestLocation: Boolean read FRequestLocation write FRequestLocation;
+    /// <summary>
+    /// Optional. If specified, the described Web App will be launched when the button
+    /// is pressed. The Web App will be able to send a “web_app_data” service message.
+    /// Available in private chats only.
+    /// </summary>
+    property WebApp: TtgWebAppInfo read FWebApp write FWebApp;
   end;
 
   /// <summary>
@@ -137,11 +172,13 @@ type
     FOneTimeKeyboard: Boolean;
     [JsonName('selective')]
     FSelective: Boolean;
+    [JsonName('input_field_placeholder')]
+    FInputFieldPlaceholder: string;
   protected
     function GetKeyboard: TArray<TArray<TtgKeyboardButton>>; override;
     procedure SetKeyboard(AKeyboard: TArray < TArray < TtgKeyboardButton >> ); override;
   public
-    constructor Create;
+    constructor Create; override;
     function AddButtonPool: TtgKeyboardButtonPool;
     /// <summary>
     /// Array of button rows, each represented by an Array of KeyboardButton objects
@@ -161,6 +198,11 @@ type
     /// input field to see the custom keyboard again. Defaults to false.
     /// </summary>
     property OneTimeKeyboard: Boolean read FOneTimeKeyboard write FOneTimeKeyboard;
+    /// <summary>
+    /// Optional. The placeholder to be shown in the input field when the keyboard is
+    /// active; 1-64 characters
+    /// </summary>
+    property InputFieldPlaceholder: string read FInputFieldPlaceholder write FInputFieldPlaceholder;
     /// <summary>
     /// Optional. Use this parameter if you want to show the keyboard to specific users
     /// only. Targets: 1) users that are @mentioned in the text of the Message object;
@@ -312,6 +354,8 @@ type
     FLoginUrl: TtgLoginUrl;
     [JsonName('callback_data')]
     FCallbackData: string;
+    [JsonName('web_app')]
+    FWebApp: TtgWebAppInfo;
     [JsonName('switch_inline_query')]
     FSwitchInlineQuery: string;
     [JsonName('switch_inline_query_current_chat')]
@@ -320,6 +364,7 @@ type
     FCallbackGame: TtgCallbackGame;
     [JsonName('pay')]
     FPay: Boolean;
+
   public
     /// <summary>
     /// Label text on the button
@@ -339,6 +384,12 @@ type
     /// 1-64 bytes
     /// </summary>
     property CallbackData: string read FCallbackData write FCallbackData;
+    /// <summary> Optional. Description of the Web App that will be launched when the
+    /// user presses the button. The Web App will be able to send an arbitrary message
+    /// on behalf of the user using the method answerWebAppQuery. Available only in
+    /// private chats between a user and the bot.
+    /// </summary>
+    property WebApp: TtgWebAppInfo read FWebApp write FWebApp;
     /// <summary>
     /// Optional. If set, pressing the button will prompt the user to select one of
     /// their chats, open that chat and insert the bot's username and the specified
@@ -438,6 +489,7 @@ end;
 
 constructor TtgReplyKeyboardMarkup.Create;
 begin
+  inherited Create;
   FResizeKeyboard := True;
 end;
 
@@ -499,6 +551,11 @@ begin
       lKb[I, J].Free;
   lKb := nil;
   SetKeyboard(lKb);
+end;
+
+constructor TtgKeyboardAbstract<TtgButton>.Create;
+begin
+  AddRow;
 end;
 
 function TtgKeyboardAbstract<TtgButton>.GetButton(const ARow, ACol: Integer): TtgButton;
